@@ -46,9 +46,9 @@ limit 1);
 ### 4 For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel?
 
 ```sql
-/* channels for this account and their count */
+/* 2 - channels for this account and their count */
 select w.channel, count(*) ct_ch from (
-/* max spending account (life-time, so would do max but easier with limit to avoid additional subquery) */
+/* 1 - max spending account (life-time, so would do max but easier with limit to avoid additional subquery) */
 select a.id, a.name, sum(o.total_amt_usd) sum
 from orders o, accounts a
 where o.account_id = a.id
@@ -62,15 +62,17 @@ group by w.channel;
 ### 5 What is the lifetime average amount spent in terms of total_amt_usd for the top 10 total spending accounts?
 
 ```sql
-/* take average of their sum */
+/* 2 - take average of their sum */
 select avg(spent_in_life_time) from (
-/* top 10 life-time-spending accounts */
+/* 1 - top 10 life-time-spending accounts */
 select a.name, sum(o.total_amt_usd) spent_in_life_time
 from orders o, accounts a
 where o.account_id = a.id
 group by a.name
 order by spent_in_life_time desc
 limit 10) t1;
+
+/* rewrite using WITH */
 
 with t1 as (select a.name, sum(o.total_amt_usd) spent_in_life_time
 from orders o, accounts a
@@ -85,9 +87,9 @@ from t1;
 ### 6 What is the lifetime average amount spent in terms of total_amt_usd, including only the companies that spent more per order, on average, than the average of all orders?
 
 ```sql
-/* take average of their sum */
+/* 2 - take average of their sum */
 select avg(spent_in_life_time) from (
-/* accounts spending more than average per order */
+/* 1 - accounts spending more than average per order */
 select a.name, sum(o.total_amt_usd) spent_in_life_time
 from orders o, accounts a
 where o.account_id = a.id
